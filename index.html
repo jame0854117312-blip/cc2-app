@@ -17,6 +17,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <script src="config.js"></script>
+<script>try{var t=JSON.parse(localStorage.getItem('ospe.theme')||'""');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
@@ -37,6 +38,7 @@
   --accent: #37C496; --accent-ink: #04190F; --accent-soft: #163B30;
   --sp: #8AB6FF; --sp-soft: #182B4A; --rf: #FF7D75; --rf-soft: #3E1C1C; --gold: #F3B84D; --gold-soft: #3A2D12;
   --skin: #B58A6A; --skin2: #9C7354; color-scheme: dark; } }
+:root[data-theme="light"] { color-scheme: light; }
 :root[data-theme="dark"] {
   --bg: #0C1412; --surface: #14201C; --surface2: #1B2A25; --ink: #E2EBE7; --muted: #94A8A0; --line: #2A3B35;
   --accent: #37C496; --accent-ink: #04190F; --accent-soft: #163B30;
@@ -8419,6 +8421,7 @@ go(location.hash.slice(1) || store.get('view', 'read'));
   const css = `
   html[data-track="sci"] { --accent: #3a5bd9; --accent-ink: #fff; --accent-soft: #e2e8fd; }
   @media (prefers-color-scheme: dark) { html[data-track="sci"]:not([data-theme="light"]) { --accent: #8ea4ff; --accent-ink: #0d1330; --accent-soft: #1d2650; } }
+  html[data-track="sci"][data-theme="dark"] { --accent: #8ea4ff; --accent-ink: #0d1330; --accent-soft: #1d2650; }
   html[data-track="sci"] .brand .mark { background: #3a5bd9; }
   .trk-pill { display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid var(--accent); color: var(--accent); background: var(--accent-soft); border-radius: 99px; padding: 5px 12px; font-weight: 700; font-size: 13.5px; cursor: pointer; white-space: nowrap; }
   .trk-pill:hover { filter: brightness(.97); }
@@ -8442,6 +8445,7 @@ go(location.hash.slice(1) || store.get('view', 'read'));
   .trk-card .last { position: absolute; right: 18px; bottom: 16px; font-size: 11.5px; color: var(--muted); }
   .sci-note { border: 1.5px dashed #b7791f; background: #fff8e6; color: #6b4a0f; border-radius: 14px; padding: 12px 14px; font-size: 14px; line-height: 1.55; margin-bottom: 14px; }
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .sci-note { background: #2b2110; color: #f3d9a4; } }
+  :root[data-theme="dark"] .sci-note { background: #2b2110; color: #f3d9a4; }
   .sci-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
   .sci-topic { border: 1.5px solid var(--line); background: var(--surface); border-radius: 14px; padding: 14px 16px; display: grid; gap: 6px; }
   .sci-topic .n { font-family: var(--f-mono); font-size: 12px; color: var(--accent); }
@@ -8539,6 +8543,61 @@ go(location.hash.slice(1) || store.get('view', 'read'));
   setTrack(track);
   const h = location.hash.slice(1);
   go(!track ? 'home' : (track === 'sci' ? (MY.includes(h) ? h : 'sciread') : (ALL.includes(h) && !MY.includes(h) ? h : store.get('view', 'read'))));
+})();
+
+// ===================== ธีม: อัตโนมัติ (ตามเครื่อง) / สว่าง / มืด =====================
+(function () {
+  document.head.insertAdjacentHTML('beforeend', `<style>
+  .thm-btn { display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 99px; padding: 5px 12px 5px 9px; font: inherit; font-weight: 700; font-size: 13.5px; line-height: 1.2; cursor: pointer; }
+  .thm-btn:hover { border-color: var(--accent); }
+  .thm-btn svg { width: 18px; height: 18px; flex: none; }
+  .thm-menu { position: fixed; z-index: 100002; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.18); padding: 6px; display: grid; gap: 2px; min-width: 190px; }
+  .thm-menu button { display: flex; align-items: center; gap: 10px; border: 0; background: none; color: inherit; font: inherit; font-size: 15px; text-align: left; padding: 9px 12px; border-radius: 10px; cursor: pointer; }
+  .thm-menu button:hover, .thm-menu button:focus-visible { background: var(--surface2); }
+  .thm-menu button[aria-checked="true"] { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+  .thm-menu button small { display: block; font-size: 12px; color: var(--muted); font-weight: 500; }
+  .thm-menu svg { width: 20px; height: 20px; flex: none; }
+  html { transition: background-color .25s ease; }
+  @media (max-width: 640px) { .thm-btn { margin-left: auto; padding: 6px 8px; } .thm-btn .tl { display: none; } }
+  </style>`);
+  const SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="currentColor" stroke="none"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>';
+  const MOON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1Z" fill="currentColor"/></svg>';
+  const AUTO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17Z" fill="currentColor" stroke="none"/></svg>';
+  const MODES = { auto: { ic: AUTO, t: 'อัตโนมัติ', d: 'ตามการตั้งค่าของเครื่อง' }, light: { ic: SUN, t: 'สว่าง', d: 'พื้นขาว อ่านง่ายกลางวัน' }, dark: { ic: MOON, t: 'มืด', d: 'พื้นเข้ม ถนอมสายตาตอนกลางคืน' } };
+  const BG = { light: '#EEF3F1', dark: '#0C1412' };
+  const root = document.documentElement;
+  const metas = [...document.querySelectorAll('meta[name="theme-color"]')];
+  metas.forEach(m => { m.dataset.orig = m.getAttribute('content'); });
+  let mode = store.get('theme', 'auto'); if (!MODES[mode]) mode = 'auto';
+  const btn = document.createElement('button');
+  btn.type = 'button'; btn.className = 'thm-btn'; btn.setAttribute('aria-haspopup', 'menu');
+  const pill = document.getElementById('trkpill');
+  if (pill) pill.insertAdjacentElement('afterend', btn); else document.querySelector('.tabs').insertAdjacentElement('beforebegin', btn);
+  const apply = (m) => {
+    mode = m;
+    if (m === 'auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', m);
+    btn.innerHTML = MODES[m].ic + `<span class="tl">${MODES[m].t}</span>`;
+    btn.setAttribute('aria-label', `ธีม: ${MODES[m].t} (แตะเพื่อเปลี่ยน)`); btn.title = `ธีม: ${MODES[m].t}`;
+    metas.forEach(mt => mt.setAttribute('content', m === 'auto' ? mt.dataset.orig : BG[m]));
+  };
+  apply(mode);
+  let menu = null;
+  const close = () => { if (menu) { menu.remove(); menu = null; btn.setAttribute('aria-expanded', 'false'); document.removeEventListener('pointerdown', outside, true); document.removeEventListener('keydown', onKey); } };
+  const outside = (e) => { if (menu && !menu.contains(e.target) && !btn.contains(e.target)) close(); };
+  const onKey = (e) => { if (e.key === 'Escape') { close(); btn.focus(); } };
+  btn.onclick = () => {
+    if (menu) return close();
+    menu = document.createElement('div'); menu.className = 'thm-menu'; menu.setAttribute('role', 'menu'); menu.setAttribute('aria-label', 'เลือกธีม');
+    menu.innerHTML = Object.entries(MODES).map(([k, v]) => `<button type="button" role="menuitemradio" aria-checked="${k === mode}" data-m="${k}">${v.ic}<span>${v.t}<small>${v.d}</small></span></button>`).join('');
+    document.body.appendChild(menu);
+    const r = btn.getBoundingClientRect(), w = menu.offsetWidth;
+    menu.style.top = (r.bottom + 8) + 'px'; menu.style.left = Math.max(12, Math.min(window.innerWidth - w - 12, r.right - w)) + 'px';
+    menu.querySelectorAll('button').forEach(b => b.onclick = () => { store.set('theme', b.dataset.m); apply(b.dataset.m); close(); btn.focus(); });
+    btn.setAttribute('aria-expanded', 'true');
+    (menu.querySelector('[aria-checked="true"]') || menu.querySelector('button')).focus();
+    document.addEventListener('pointerdown', outside, true); document.addEventListener('keydown', onKey);
+  };
+  window.addEventListener('resize', close); window.addEventListener('scroll', close, { passive: true });
 })();
 
 </script>

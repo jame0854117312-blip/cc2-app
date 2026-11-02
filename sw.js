@@ -2,7 +2,7 @@
  * หน้าแอป: ดึงจากเน็ตก่อน (ได้เวอร์ชันล่าสุดเสมอ) ถ้าไม่มีเน็ตใช้ตัวที่เก็บไว้
  * ฟอนต์: เก็บไว้ใช้ออฟไลน์หลังเปิดครั้งแรก
  * Google Apps Script (ตารางคะแนน): ไม่เก็บ ส่งตรงเสมอ */
-const VERSION = 'cc2-cff8e17ada';
+const VERSION = 'cc2-54f5350fc2';
 const FONTS = 'cc2-fonts';
 const CORE = ['./', './index.html', './config.js', './manifest.webmanifest',
   './icon-192.png', './icon-512.png', './maskable-512.png', './apple-touch-icon.png', './favicon-32.png'];
